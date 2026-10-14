@@ -65,3 +65,21 @@ The client never decides whether a bid is valid. The server checks authenticatio
 4. Configure HTTPS, exact CORS origin, WebSocket support, health checks, and log collection.
 5. Promote a dedicated account to admin using a one-off controlled script; do not expose admin bootstrap publicly.
 6. Seed reviewed listings, verify monitoring and backups, and run integration/concurrency tests before sharing credentials.
+
+## Bid correctness
+
+The client never decides whether a bid is valid. The server validates authentication, the bid amount, auction status and timing, self-bidding restrictions, and the minimum increment.
+
+Bid acceptance uses a conditional MongoDB `findOneAndUpdate()` inside a transaction. The database update verifies the auction's eligibility and minimum bid amount before updating the current price, highest bidder, and bid count. The corresponding bid record is inserted using the same transaction session, so both operations commit or abort together.
+
+The Bid schema defines a unique compound index on `(bidder, idempotencyKey)`. The route checks for previously processed requests and rejects reuse of an idempotency key with different request details. The deployed database must have this index successfully created for the database-level uniqueness guarantee to apply.
+
+MongoDB transactions require a supported replica-set or sharded deployment.
+
+## Logging
+
+The application uses Pino for structured logging and `pino-http` for HTTP request logging. The logger configures a log level through `LOG_LEVEL` and redacts configured sensitive fields.
+
+## Authentication and validation
+
+Authentication routes use Zod to validate registration and login input. Password registration uses bcrypt hashing with a cost factor of 12. Auction routes also validate auction and bid input with Zod.
