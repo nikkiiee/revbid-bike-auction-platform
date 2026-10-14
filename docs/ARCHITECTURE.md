@@ -225,4 +225,3 @@ Further validation should include:
 - Multi-instance Socket.IO event-delivery tests.
 - Load, security, and backup-recovery testing.
 
-Features or guarantees that have not been implemented and verified should remain documented as limitations or future improvements.

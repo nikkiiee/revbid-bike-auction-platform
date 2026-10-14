@@ -30,14 +30,13 @@
 2. **Observability:** Health endpoints and structured logs support operational checks, but they do not replace metrics, alerting, distributed tracing, or comprehensive dependency monitoring.
 3. **Payments and identity:** Payment processing, escrow, identity verification, refunds, and dispute handling are outside the current scope.
 4. **Image handling:** Listings use image URLs rather than a complete secure upload and storage pipeline.
-5. **Administrator interface:** The administrator interface must be verified against the required management workflows. Any missing functionality should be completed before claiming full administrative management support.
-6. **Automated testing:** Broader integration, transaction rollback, idempotency, and concurrent-bidding tests are needed before a public production launch.
-7. **Demo listings:** Demo listings may be fallback content rather than database records and cannot accept bids.
-8. **Token storage:** The current implementation uses browser `localStorage` for JWT persistence. Because JavaScript can access this storage, an XSS vulnerability could expose a token. A more hardened public deployment should evaluate HttpOnly cookies with appropriate Secure, SameSite, and CSRF protections.
+5. **Automated testing:** Broader integration, transaction rollback, idempotency, and concurrent-bidding tests are needed before a public production launch.
+6. **Demo listings:** Demo listings may be fallback content rather than database records and cannot accept bids.
+7. **Token storage:** The current implementation uses browser `localStorage` for JWT persistence. Because JavaScript can access this storage, an XSS vulnerability could expose a token. A more hardened public deployment should evaluate HttpOnly cookies with appropriate Secure, SameSite, and CSRF protections.
 
 ## 4. Future Improvements
 
-- Complete and verify the administrator dashboard and user moderation workflows.
+- Continue improving the administrator dashboard and user moderation workflows as requirements evolve.
 - Add distributed lifecycle scheduling or coordinated job claiming for multi-instance deployments.
 - Configure a shared Socket.IO adapter for real-time event delivery across backend instances.
 - Expand authorization, idempotency, transaction rollback, and concurrent-bidding tests.
@@ -56,7 +55,7 @@ The application is deployed using the following services:
 - **Backend:** Render — Node.js and Express API with Socket.IO.
 - **Database:** MongoDB Atlas — managed MongoDB persistence.
 
-The frontend origin must match the backend CORS configuration. Production secrets, including database credentials and JWT signing secrets, must be stored securely in the hosting provider's environment settings.
+The frontend origin must match the backend CORS configuration. Production secrets, including database credentials and JWT signing secrets, must be stored securely in hosting-provider environment settings.
 
 The deployed application URLs are:
 
@@ -83,4 +82,3 @@ Before a public production launch, additional validation should cover:
 - Multi-instance lifecycle coordination and Socket.IO event delivery.
 - Load, security, and backup-recovery testing.
 
-Features that have not been implemented or verified must be documented as limitations or future improvements rather than presented as completed capabilities.
