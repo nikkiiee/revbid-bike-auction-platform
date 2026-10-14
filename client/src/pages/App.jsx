@@ -903,6 +903,7 @@ function AuctionDetail({ user }) {
   const [bids, setBids] = useState([]);
   const [amount, setAmount] = useState(0);
   const [notice, setNotice] = useState('');
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now());
   // Update the countdown once per second.
@@ -911,16 +912,49 @@ function AuctionDetail({ user }) {
     return () => clearInterval(timer);
   }, []);
   // Fetch the auction and its bid history.
-  useEffect(() => {
-    if (id.startsWith('demo')) return;
-    api.get(`/auctions/${id}`)
-      .then(({ data }) => {
-        setAuction(data.auction);
-        setBids(data.bids || []);
-        setAmount(data.auction.currentPrice + data.auction.minIncrement);
-      })
-      .catch(() => setNotice('Auction could not be loaded.'));
-  }, [id]);
+  
+useEffect(() => {
+  if (id.startsWith('demo')) {
+    setLoading(false);
+    return;
+  }
+
+  let cancelled = false;
+
+  setLoading(true);
+  setNotice('');
+
+  api.get(`/auctions/${id}`)
+    .then(({ data }) => {
+      if (cancelled) return;
+
+      setAuction(data.auction);
+      setBids(data.bids || []);
+      setAmount(
+        data.auction.currentPrice + data.auction.minIncrement
+      );
+    })
+    .catch((error) => {
+      if (cancelled) return;
+
+      setAuction(null);
+
+      if (error.response?.status === 404) {
+        setNotice('This auction could not be found.');
+      } else {
+        setNotice('Unable to load this auction. Please try again.');
+      }
+    })
+    .finally(() => {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    });
+
+  return () => {
+    cancelled = true;
+  };
+}, [id]);
   // Real-time bidding and ending events.
   useEffect(() => {
     if (id.startsWith('demo')) return;
@@ -983,6 +1017,13 @@ if (!token) {
       socket.disconnect();
     };
   }, [id]);
+  if (loading) {
+  return (
+    <main className="detail-page">
+      <p>Loading auction details...</p>
+    </main>
+  );
+}
   if (!auction) {
     return (
       <main className="detail-page">
