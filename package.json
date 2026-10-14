@@ -1,0 +1,5 @@
+{
+  "name":"bike-auction-platform","private":true,"version":"1.0.0",
+  "scripts":{"dev":"concurrently -n api,web -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"","build":"npm run build --prefix client","test":"npm test --prefix server"},
+  "devDependencies":{"concurrently":"^9.1.2"}
+}
